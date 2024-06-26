@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>YouTube Transcript Fetcher</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Animate.css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <style>
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background: #f8f9fa;
+        font-family: Arial, sans-serif;
+      }
+      .cover-container {
+        text-align: center;
+        background: white;
+        padding: 2rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 0 1rem rgba(0,0,0,0.1);
+      }
+      .form-group input {
+        height: 3rem;
+        font-size: 1.2rem;
+      }
+      .btn {
+        height: 3rem;
+        font-size: 1.2rem;
+      }
+      pre {
+        text-align: left;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cover-container">
+      <h1 class="animate__animated animate__fadeInDown">YouTube Transcript Fetcher</h1>
+      <p class="lead animate__animated animate__fadeInUp">Easily fetch and view transcripts of YouTube videos</p>
+      <form id="youtube-form" class="mt-4">
+        <div class="form-group">
+          <input type="text" class="form-control" id="youtube-link" name="youtube_link" placeholder="Enter YouTube link" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block animate__animated animate__pulse">Fetch Transcript</button>
+      </form>
+      <p id="status" class="text-center mt-3"></p>
+      <pre id="transcript-output" class="mt-3 p-3 bg-light text-dark border rounded"></pre>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script>
+      $('#youtube-form').on('submit', function(e) {
+        e.preventDefault();
+        const youtubeLink = $('#youtube-link').val();
+        $('#status').text('Fetching transcript...').addClass('animate__animated animate__flash');
+        $('#transcript-output').text('');
+        $.ajax({
+          url: '/generate_code',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ youtube_link: youtubeLink }),
+          success: function(response) {
+            if (response.transcript) {
+              $('#status').text('Transcript fetched successfully.').removeClass('animate__flash').addClass('animate__animated animate__fadeInUp');
+              $('#transcript-output').text(response.transcript).addClass('animate__animated animate__fadeIn');
+            } else {
+              $('#status').text('Error fetching transcript.').removeClass('animate__flash').addClass('animate__animated animate__shakeX');
+            }
+          },
+          error: function(error) {
+            $('#status').text('Error fetching transcript.').removeClass('animate__flash').addClass('animate__animated animate__shakeX');
+            $('#transcript-output').text('Error fetching transcript');
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
